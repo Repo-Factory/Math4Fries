@@ -23,7 +23,7 @@
 #define DELAY_SAMPLES   50
 
 #define SRES    50      // resolution of spline interpolation
-#define DEPTH   9       // number of origin points to interpolate accross
+#define DEPTH   4       // number of origin points to interpolate accross
 
 struct RowParams {
     uint32_t    rbfield;    // bitfield
