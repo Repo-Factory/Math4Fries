@@ -19,7 +19,8 @@
 //#define DEBUG
 //#define DEBUG_ARRAY_SORT
 #define REAL_DATA
-//#define ALEC_DIAG
+//#define OUTPUT_PRINT
+//#define ALEC_DIAG         // Comment out for joseph solver
 #define DELAY_SAMPLES   50
 
 #define SRES    50      // resolution of spline interpolation
@@ -70,11 +71,13 @@ void main() {
         x[n] = n * SRES;
         //printf("%f\t%f\n", x[n], y[n]);
     }
-    
+
+#ifdef DEBUG
     printf("X:\n");
     arrayPrint(x, 0, DEPTH);
     printf("Y:\n");
     arrayPrint(y, 0, DEPTH);
+#endif
 #else
     float x[DEPTH] = { 0,1,2,3,4 };
     float y[DEPTH] = { 1,3,2,4,1 };
@@ -87,10 +90,14 @@ void main() {
     struct Cartesian* output;
     output = qSpline(x, y);
 
+#ifdef OUTPUT_PRINT
     printf("Output Points Set:\n");
+#endif
     for(int m = 0; m < DEPTH - 1; m++){
         for(int n = 0; n < SRES; n++){
+#ifdef OUTPUT_PRINT
             printf("Point [%2u] = {%.2f, %.2f}\n", n, output->x[m][n], output->y[m][n]);
+#endif
             fprintf(fp, "%.2f, %.2f\n", output->x[m][n], output->y[m][n]);
         }
         fprintf(fd, "%.2f, %.2f\n", x[m], y[m]);
@@ -105,6 +112,7 @@ void main() {
     arrayPrint(y, 0, DEPTH);
 #endif
 
+#ifdef OUTPUT_PRINT
     printf("x Spline:\n");
     for(uint16_t i = 0; i < DEPTH - 1; ++i){
         printf("[");
@@ -121,6 +129,7 @@ void main() {
         }
         printf("]\n");
     }
+#endif
 
     fclose(fp);
     fclose(fd);
