@@ -16,7 +16,8 @@
 #include <math.h>
 #include <malloc.h>         // oh yeahhhhh
 
-#define DEBUG
+//#define DEBUG
+//#define DEBUG_ARRAY_SORT
 #define REAL_DATA
 //#define ALEC_DIAG
 #define DELAY_SAMPLES   50
@@ -44,12 +45,12 @@ void    arrayPrint(float[], uint16_t, uint16_t);
 void    array2Print(float A[][4 * (DEPTH - 1)], uint16_t, uint16_t);
 void    diagonal(float[], float A[][4*(DEPTH-1)], float[], int);
 void    other_diagonal(float a[][4 * (DEPTH - 1)], float *b, int N);
-void reverse_bin_print(struct RowParams arr[], int N);   // debug presence bitfield
-void calc_presence(float a[][4 * (DEPTH - 1)], struct RowParams arr[], int N);
+void    reverse_bin_print(struct RowParams arr[], int N);   // debug presence bitfield
+void    calc_presence(float a[][4 * (DEPTH - 1)], struct RowParams arr[], int N);
 uint8_t find_rows_2_correct(struct RowParams arr[], uint8_t *row2corr, int N);
 uint8_t recursive_solver_2(float a[][4 * (DEPTH - 1)], float *b, struct RowParams ROWZ[], uint8_t *rows_2_correct, int N);
 uint8_t check_diag_from_presence(struct RowParams arr[], int N);
-void print_diag_contents(float a[][4 * (DEPTH - 1)], struct RowParams arr[], int N);
+void    print_diag_contents(float a[][4 * (DEPTH - 1)], struct RowParams arr[], int N);
 void    swapRow(float a[][4 * (DEPTH - 1)], float[], uint16_t, uint16_t);
 
 void main() {
@@ -96,11 +97,13 @@ void main() {
     }
     fprintf(fd, "%.2f, %.2f\n", x[DEPTH-1], y[DEPTH-1]);
 
+#ifdef DEBUG
     printf("From Dataset:\n");
     printf("X:\n"); 
     arrayPrint(x, 0, DEPTH);
     printf("Y:\n");
     arrayPrint(y, 0, DEPTH);
+#endif
 
     printf("x Spline:\n");
     for(uint16_t i = 0; i < DEPTH - 1; ++i){
@@ -205,6 +208,8 @@ struct Cartesian* qSpline(float x[], float y[]) {
         }
     }
     b[j] = 0;
+
+#ifdef DEBUG_ARRAY_SORT
     arrayPrint(A[j], (n - 1) * 4, n * 4);
 
     printf("b:\n");
@@ -214,7 +219,7 @@ struct Cartesian* qSpline(float x[], float y[]) {
     for (uint16_t i = 0; i < 4 * n; ++i) {
         arrayPrint(A[i], 0, 4 * n);
     }
-
+#endif
     float* xx = solveLU(A, b);
     //printf("xx:\n");
     //arrayPrint(xx,0,4*n);
@@ -335,11 +340,13 @@ float* solveLU(float A[][4 * (DEPTH - 1)], float b[]) {
     //diagonal(x, A, b, n);
 #else
     other_diagonal(A, b, n);
+#ifdef DEBUG_ARRAY_SORT
     printf("WE ARE NOW OUT OF THE DIAGONAL FUNCTION!!!\n");
     printf("a:\n");
     array2Print(A, 0, n);
     printf("b:\n");
     arrayPrint(b, 0, n);
+#endif
 #endif
     for (int k = 0; k < n; k++) {
         for (int i = k + 1; i < n; i++){
@@ -366,8 +373,10 @@ float* solveLU(float A[][4 * (DEPTH - 1)], float b[]) {
         //array2Print(A, 0, n);
     }
 
+#ifdef DEBUG_ARRAY_SORT
     printf("Final A:\n");
     array2Print(A, 0, n);
+#endif
 
     for (int i = n - 1; i >= 0; i--) {
         float s = 0;
@@ -377,8 +386,10 @@ float* solveLU(float A[][4 * (DEPTH - 1)], float b[]) {
         x[i] = (b[i] - s) / A[i][i];
     }
 
+#ifdef DEBUG_ARRAY_SORT
     printf("x:\n");
     arrayPrint(x, 0, n);
+#endif
     return x;
 }
 
@@ -460,11 +471,12 @@ void other_diagonal(float a[][4 * (DEPTH - 1)], float *b, int N){
     struct RowParams ROWZ[N];
 
     calc_presence(a, ROWZ, N);
-    
+
+#ifdef DEBUG_ARRAY_SORT    
     printf("Array Size: %2u\n", N);
     reverse_bin_print(ROWZ, N);  // print presence bitfield
     printf("\n");
-
+#endif
 
     
     uint16_t diag_ctr = 0;
@@ -474,8 +486,10 @@ void other_diagonal(float a[][4 * (DEPTH - 1)], float *b, int N){
             if((ROWZ[n].rbfield < ROWZ[n-1].rbfield)){
                 swapRow(a, b, n, n - 1);
                 calc_presence(a, ROWZ, N);
+#ifdef DEBUG_ARRAY_SORT
                 printf("-> Swapped Rows: %2u and %2u\n", n, n-1);
                 reverse_bin_print(ROWZ, N);  // print presence bitfield
+#endif
             }
         }
         diag_ctr += 1;
@@ -537,7 +551,7 @@ uint8_t rows_2_correct[N];
 
 #endif
 
-
+#ifdef DEBUG_ARRAY_SORT
     printf("\nResulting Presence Array:\n");
     calc_presence(a, ROWZ, N);
     reverse_bin_print(ROWZ, N);  // print presence bitfield
@@ -550,8 +564,10 @@ uint8_t rows_2_correct[N];
     array2Print(a, 0, N);
     printf("b:\n");
     arrayPrint(b, 0, N);
-
+#endif
+#ifdef DEBUG_ARRAY_SORT
     printf("%s\n", (check_diag_from_presence(ROWZ, N)) ? "Ladies and Gentlemen, we got him" : "f u c k o f f l i n e a r a l g (we failed)");
+#endif
 }
 
 uint8_t find_rows_2_correct(struct RowParams arr[], uint8_t *row2corr, int N){
@@ -571,12 +587,16 @@ uint8_t recursive_solver_2(float a[][4 * (DEPTH - 1)], float *b, struct RowParam
     
     for(uint_fast16_t n = 0; n < num_rows ; n++){
         //num_rows = find_rows_2_correct(ROWZ, rows_2_correct, N);
+#ifdef DEBUG_ARRAY_SORT
         printf("-> Row we're correcting: %2u @ Iter: %2u\n", rows_2_correct[n], n);
+#endif
         uint_fast16_t m = 0;
         for(; m < N; m++){
             if((ROWZ[rows_2_correct[n]].rbfield & (1lu << m)) && (ROWZ[m].rbfield & (1lu << rows_2_correct[n]))){
                 swapRow(a, b, rows_2_correct[n], m);
+#ifdef DEBUG_ARRAY_SORT
                 printf("--> Swapped Rows: %2u and %2u\n", rows_2_correct[n], m);
+#endif                
                 calc_presence(a, ROWZ, N);
                 break;
             }
@@ -584,11 +604,15 @@ uint8_t recursive_solver_2(float a[][4 * (DEPTH - 1)], float *b, struct RowParam
         if(m == N){     // Failed to find a simple swap match, must do alt strategy
             swapRow(a, b, rows_2_correct[n], rows_2_correct[n] + 1);
             calc_presence(a, ROWZ, N);
+#ifdef DEBUG_ARRAY_SORT
             printf("--> Swapped Rows: %2u and %2u\tFAILOVER\n", rows_2_correct[n], rows_2_correct[n] + 1);
+#endif
             retval = recursive_solver_2(a, b, ROWZ, rows_2_correct, N);
         }
     }
+#ifdef DEBUG_ARRAY_SORT
     printf("Iteration %3u, solving for %2u rows.\n", retval, num_rows);
+#endif
     return retval++;
 }
 
