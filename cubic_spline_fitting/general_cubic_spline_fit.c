@@ -24,7 +24,7 @@
 #define DELAY_SAMPLES   50
 
 #define SRES    50      // resolution of spline interpolation
-#define DEPTH   4       // number of origin points to interpolate accross
+#define DEPTH   8       // number of origin points to interpolate accross
 
 struct RowParams {
     uint32_t    rbfield;    // bitfield
@@ -82,11 +82,18 @@ void main() {
     float x[DEPTH] = { 0,1,2,3,4 };
     float y[DEPTH] = { 1,3,2,4,1 };
 #endif
+    
+    if(4 * (DEPTH - 1) > 32 + 1){
+        printf("Depth too large! Cannot create bitfield.\n");
+        return;
+    }
+    
+    
     FILE *fp;
     FILE *fd;
     fp = fopen("pogout.txt", "w+");
     fd = fopen("pogin.txt", "w+");
-    
+
     struct Cartesian* output;
     output = qSpline(x, y);
 
