@@ -378,7 +378,7 @@ float* solveLU(float A[][4 * (DEPTH - 1)], float b[]) {
             float M = A[i][k] / A[k][k];
             //printf("M = %f / %f = %f\n", A[i][k] , A[k][k], M);
             for (int j = k; j < n; j++) {
-                float dbgf = A[i][j];
+                //float dbgf = A[i][j];
                 A[i][j] -= M * A[k][j]; 
                 //printf("A[%2u][%2u] = %f - (%f * %f) = %f - %f = %f\n", i, j, dbgf, M, A[k][j], dbgf, M * A[k][j], A[i][j]);
             }
