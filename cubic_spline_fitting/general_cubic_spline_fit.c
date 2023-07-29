@@ -20,11 +20,11 @@
 //#define DEBUG_ARRAY_SORT
 #define REAL_DATA
 //#define OUTPUT_PRINT
-//#define ALEC_DIAG         // Comment out for joseph solver
-#define DELAY_SAMPLES   50
+//#define ALEC_DIAG         // Comment out for joseph solver to be used
+#define DELAY_SAMPLES   550
 
 #define SRES    50      // resolution of spline interpolation
-#define DEPTH   8       // number of origin points to interpolate accross
+#define DEPTH   9       // number of origin points to interpolate accross
 
 struct RowParams {
     uint32_t    rbfield;    // bitfield
