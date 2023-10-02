@@ -18,6 +18,7 @@
 #ifndef MATRIX_ACCEL_h
 #define MATRIX_ACCEL_h
 
+#include <stdio.h>
 #include <inttypes.h>
 
 
@@ -47,6 +48,12 @@ typedef double  LONG_MATRIX_D_TYPE;
 #define DATA_SIZE       sizeof(MATRIX_D_TYPE)
 #define LONG_DATA_SIZE  sizeof(LONG_MATRIX_D_TYPE)
 
+#define MTX_FUNC_OK     0
+#define MTX_FUNC_FAIL   -1
+
+#ifndef NULL
+#define NULL    0ul
+#endif
 
 struct Matrix_t {
     unsigned int size_x;
@@ -57,17 +64,19 @@ struct Matrix_t {
 
 
 // Core Functions
-struct  Matrix_t    *Create_Matrix(int size_x, int size_y);
+struct  Matrix_t    *Create_Matrix(unsigned int size_x, unsigned int size_y);
 struct  Matrix_t    *Copy_Matrix(struct Matrix_t *matrix);
-int                 Destroy_Matrix(struct Matrix_t *matrix);
-
+int                 Destroy_Matrix(struct Matrix_t *cool_matrix);
+void                Print_Matrix(struct Matrix_t *cool_matrix);
+int                 Fill_Matrix(struct Matrix_t *cool_matrix, MATRIX_D_TYPE fill_val);
 
 // Core Function Wrappers
-struct  Matrix_t    *Create_Square_Matrix(int order);
+struct  Matrix_t    *Create_Square_Matrix(unsigned int order);
+void                Print_Matrix_w_Header(struct Matrix_t *cool_matrix);
 
 // Sub-Core Functions
 int                 Swap_Matrix_Rows(struct Matrix_t *matrix, unsigned int row_0, unsigned int row_1);
-struct Matrix_t     *Pad_Matrix(struct Matrix_t *A, unsigned int val_2_pad, int num_left, int num_top, int num_bot, int num_right); // Does not destroy or alter input
+struct Matrix_t     *Pad_Matrix(struct Matrix_t *A, MATRIX_D_TYPE val_2_pad, int num_left, int num_top, int num_bot, int num_right); // Does not destroy or alter input
 
 // Core Verification Functions
 static inline unsigned char __same_dimension_mtx(struct Matrix_t *mat_0, struct Matrix_t *mat_1){
@@ -108,7 +117,7 @@ int                 Transpose_Matrix(struct Matrix_t *cool_matrix);             
 struct Matrix_t     *Mul_Matrix(struct Matrix_t *A, struct Matrix_t *B);                // C = A * B,       A.x == B.y, A.y == B.x
 int                 Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B);           // A = A .* B,      A.size == B.size
 struct Matrix_t     *n_Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B);        // M2 = A .* B,     A.size == B.size
-struct Matrix_t     *Mul_Large_Matrix(struct Matrix *A, struct Matrix_t *B);            // M2 = A .* B^T,   Ensures more cache hits accelerating large array multiplies
+struct Matrix_t     *Mul_Large_Matrix(struct Matrix_t *A, struct Matrix_t *B);          // M2 = A .* B^T,   Ensures more cache hits accelerating large array multiplies
 LONG_MATRIX_D_TYPE  Sum_of_Matrix_Elements_ull(struct Matrix_t *A);                     // RET = SUM(A)
 
 

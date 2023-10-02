@@ -33,6 +33,7 @@ struct Matrix_t         *Create_Matrix(uint8_t dimension_x, uint8_t dimension_y)
 struct Matrix_t         *Create_Square_Matrix(uint8_t dimension);
 int                     Destroy_Matrix(struct Matrix_t *cool_matrix);
 void                    Print_Matrix(struct Matrix_t *cool_matrix);
+void                    Print_Matrix_w_Header(struct Matrix_t *cool_matrix);
 
 // Static util, do not call these.
 static int _are_matricies_the_same_dimension(struct Matrix_t *cool_matrix_0, struct Matrix_t *cool_matrix_1);
