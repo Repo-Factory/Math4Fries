@@ -80,6 +80,9 @@ int                 Fill_Matrix(struct Matrix_t *cool_matrix, MATRIX_D_TYPE fill
 
 // Core Function Wrappers
 struct  Matrix_t    *Create_Square_Matrix(unsigned int order);
+struct  Matrix_t    *Create_Ones_Matrix(unsigned int size_x, unsigned int size_y);
+struct  Matrix_t    *Create_Zeros_Matrix(unsigned int size_x, unsigned int size_y);
+struct  Matrix_t    *Create_ID_Matrix(unsigned int order);
 void                Print_Matrix_w_Header(struct Matrix_t *cool_matrix);
 
 // Sub-Core Functions
