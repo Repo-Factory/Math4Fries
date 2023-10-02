@@ -48,6 +48,7 @@ int Destroy_Matrix(struct Matrix_t *cool_matrix){
         for(int n = 0; n < cool_matrix->size_y; ++n){
             free(cool_matrix->data[n]);
         }
+        free(cool_matrix->data);
         free(cool_matrix);
         retval = MTX_FUNC_OK;
     }
