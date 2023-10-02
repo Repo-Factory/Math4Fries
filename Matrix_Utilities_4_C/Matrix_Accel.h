@@ -125,9 +125,13 @@ int                 Transpose_Matrix(struct Matrix_t *cool_matrix);             
 LONG_MATRIX_D_TYPE  _Vector_Dot_Product(MATRIX_D_TYPE *v0, MATRIX_D_TYPE *v1, unsigned int len);    // SUM(V0[n] * V1[n])
 struct Matrix_t     *Mul_Matrix(struct Matrix_t *A, struct Matrix_t *B);                // C = A * B,       A.x == B.y, A.y == B.x
 int                 Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B);           // A = A .* B,      A.size == B.size
-struct Matrix_t     *n_Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B);        // M2 = A .* B,     A.size == B.size
-struct Matrix_t     *Mul_Large_Matrix(struct Matrix_t *A, struct Matrix_t *B);          // M2 = A .* B^T,   Ensures more cache hits accelerating large array multiplies
+struct Matrix_t     *n_Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B);        // C = A .* B,     A.size == B.size
+struct Matrix_t     *Mul_Large_Matrix(struct Matrix_t *A, struct Matrix_t *B);          // C = A .* B^T,   Ensures more cache hits accelerating large array multiplies
+struct Matrix_t     *Mul_TPSD_Matrix(struct Matrix_t *A, struct Matrix_t *B);           // C = A .* B^T,   Arg B comes in trasnposed. Ensures more cache hits accelerating large array multiplies
 LONG_MATRIX_D_TYPE  Sum_of_Matrix_Elements(struct Matrix_t *A);                         // RET = SUM(A)
 
+
+// Ordering Functions
+int MTX_Order_NonZero_Diagonals(struct Matrix_t *A, struct Matrix_t *B);                // Orders A such that diagonals are non-zero, if B is provided perform same row operations on B
 
 #endif

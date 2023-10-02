@@ -314,7 +314,7 @@ int Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B){
 }
 
 
-// M2 = A .* B^T,   Ensures more cache hits accelerating large array multiplies
+// C = A .* B^T,   Ensures more cache hits accelerating large array multiplies
 struct Matrix_t *Mul_Large_Matrix(struct Matrix_t *A, struct Matrix_t *B){
     struct Matrix_t *C = NULL;
     if(__can_be_multiplied_mtx(A,B)){
@@ -335,6 +335,21 @@ struct Matrix_t *Mul_Large_Matrix(struct Matrix_t *A, struct Matrix_t *B){
 }
 
 
+// C = A .* B^T,   Arg B comes in trasnposed. 
+struct Matrix_t *Mul_TPSD_Matrix(struct Matrix_t *A, struct Matrix_t *B){
+    struct Matrix_t *C = NULL;
+    if(__same_dimension_mtx(A,B)){
+        C = Create_Matrix(A->size_y,B->size_x);
+        for(unsigned int y = 0; y < A->size_y; ++y){
+            for(unsigned int x = 0; x < B->size_y; ++x){
+                C->data[y][x] = _Vector_Dot_Product(A->data[y],B->data[x], A->size_x);
+            }
+        }
+    }
+    return C;
+}
+
+
 // RET = SUM(A)
 LONG_MATRIX_D_TYPE  Sum_of_Matrix_Elements(struct Matrix_t *A){
     LONG_MATRIX_D_TYPE sum_ = 0;
@@ -347,4 +362,34 @@ LONG_MATRIX_D_TYPE  Sum_of_Matrix_Elements(struct Matrix_t *A){
     }
 
     return sum_;
+}
+
+
+// Ordering Functions
+// Orders A such that diagonals are non-zero, if B is provided perform same row operations on B
+int MTX_Order_NonZero_Diagonals(struct Matrix_t *A, struct Matrix_t *B){
+    int retval = MTX_FUNC_FAIL;
+    if(A){
+        if(__is_square_mtx(A)){
+                for(unsigned int n = 0; n < A->size_y; ++n){
+                    if(!A->data[n][n]){
+                        unsigned int m;
+                        for(m = 0; m < A->size_y; ++m){
+                            if(A->data[m][n] && A->data[n][m]){
+                                Swap_Matrix_Rows(A,m,n);
+                            }
+                        }
+                        if(m == A->size_y){
+                            retval = MTX_FUNC_FAIL;
+                            goto mtx_not_sortable;
+                        } 
+                    }
+                }
+                retval = MTX_FUNC_OK;
+            }
+        }
+
+    mtx_not_sortable:
+
+    return retval;
 }
