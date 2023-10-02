@@ -108,6 +108,31 @@ void Print_Matrix_w_Header(struct Matrix_t *cool_matrix){
     }
 }
 
+// Create X by Y matrix of 1s
+struct Matrix_t *Create_Ones_Matrix(unsigned int size_x, unsigned int size_y){
+    struct Matrix_t *A = Create_Matrix(size_x, size_y);
+    Fill_Matrix(A,1);
+    return A;
+}
+
+// Create X by Y matrix of 0s
+struct Matrix_t *Create_Zeros_Matrix(unsigned int size_x, unsigned int size_y){
+    struct Matrix_t *A = Create_Matrix(size_x, size_y);
+    Fill_Matrix(A,0);
+    return A;
+}
+
+// Create NxN ID matrix
+struct Matrix_t *Create_ID_Matrix(unsigned int order){
+    struct Matrix_t *A = Create_Zeros_Matrix(order, order);
+    if(A){
+        for(unsigned int n = 0; n < order; ++n){
+            A->data[n][n] = 1;
+        }
+    }
+    return A;
+}
+
 
 // Sub-Core Functions
 // Swap row pointers
