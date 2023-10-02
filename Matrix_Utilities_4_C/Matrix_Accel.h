@@ -55,6 +55,14 @@ typedef double  LONG_MATRIX_D_TYPE;
 #define NULL    0ul
 #endif
 
+#ifndef FALSE
+#define FALSE   0
+#endif
+
+#ifndef TRUE
+#define TRUE    1
+#endif
+
 struct Matrix_t {
     unsigned int size_x;
     unsigned int size_y;
@@ -113,12 +121,13 @@ struct Matrix_t     *n_Add_Matrix(struct Matrix_t *A, struct Matrix_t *B);      
 int                 Sub_Matrix(struct Matrix_t *A, struct Matrix_t *B);                 // A = A - B,       A.size == B.size
 struct Matrix_t     *n_Sub_Matrix(struct Matrix_t *A, struct Matrix_t *B);              // C = A - B,       A.size == B.size
 struct Matrix_t     *n_Transpose_Matrix(struct Matrix_t *cool_matrix);                  // C = A ^ T,       ( cat :p ), does not delete A
-int                 Transpose_Matrix(struct Matrix_t *cool_matrix);                     // A = A ^ T,       
+int                 Transpose_Matrix(struct Matrix_t *cool_matrix);                     // A = A ^ T,       t
+LONG_MATRIX_D_TYPE  _Vector_Dot_Product(MATRIX_D_TYPE *v0, MATRIX_D_TYPE *v1, unsigned int len);    // SUM(V0[n] * V1[n])
 struct Matrix_t     *Mul_Matrix(struct Matrix_t *A, struct Matrix_t *B);                // C = A * B,       A.x == B.y, A.y == B.x
 int                 Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B);           // A = A .* B,      A.size == B.size
 struct Matrix_t     *n_Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B);        // M2 = A .* B,     A.size == B.size
 struct Matrix_t     *Mul_Large_Matrix(struct Matrix_t *A, struct Matrix_t *B);          // M2 = A .* B^T,   Ensures more cache hits accelerating large array multiplies
-LONG_MATRIX_D_TYPE  Sum_of_Matrix_Elements_ull(struct Matrix_t *A);                     // RET = SUM(A)
+LONG_MATRIX_D_TYPE  Sum_of_Matrix_Elements(struct Matrix_t *A);                         // RET = SUM(A)
 
 
 #endif

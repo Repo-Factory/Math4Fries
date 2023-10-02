@@ -142,3 +142,209 @@ struct Matrix_t *Pad_Matrix(struct Matrix_t *A, MATRIX_D_TYPE val_2_pad, int num
 
     return B;
 }
+
+
+// Basic Maths
+
+// A == B,          A.size == B.size
+int Are_Matricies_Equal(struct Matrix_t *A, struct Matrix_t *B){
+    int retval = FALSE;
+
+    if(__same_dimension_mtx(A,B)){
+        retval = TRUE;
+        for(unsigned int y = 0; y < A->size_y; ++y){
+            for(unsigned int x = 0; x < A->size_x; ++x){
+                if(A->data[y][x] != B->data[y][x]){
+                    retval = FALSE;
+                    goto exit_equality_check;
+                }
+            }
+        }
+    }
+
+    exit_equality_check:
+
+    return retval;
+}
+
+
+// A = A + B,       A.size == B.size
+int Add_Matrix(struct Matrix_t *A, struct Matrix_t *B){
+    int retval = FALSE;
+
+    if(__same_dimension_mtx(A,B)){
+        for(unsigned int y = 0; y < A->size_y; ++y){
+            for(unsigned int x = 0; x < A->size_x; ++x){
+                A->data[y][x] += B->data[y][x];
+            }
+        }
+        
+        retval = TRUE;
+    }
+
+    return retval;
+}  
+
+
+// C = A + B,       A.size == B.size
+struct Matrix_t *n_Add_Matrix(struct Matrix_t *A, struct Matrix_t *B){
+    struct Matrix_t *C = NULL;
+    
+    if(__same_dimension_mtx(A,B)){
+        C = Create_Matrix(A->size_x,A->size_y);
+        if(C){
+            for(unsigned int y = 0; y < C->size_y; ++y){
+                for(unsigned int x = 0; x < C->size_x; ++x){
+                    C->data[y][x] = A->data[y][x] + B->data[y][x];
+                }
+            }
+        }
+    }
+
+    return C;
+}
+
+
+// A = A - B,       A.size == B.size
+int Sub_Matrix(struct Matrix_t *A, struct Matrix_t *B){
+    int retval = FALSE;
+
+    if(__same_dimension_mtx(A,B)){
+        for(unsigned int y = 0; y < A->size_y; ++y){
+            for(unsigned int x = 0; x < A->size_x; ++x){
+                A->data[y][x] -= B->data[y][x];
+            }
+        }
+        
+        retval = TRUE;
+    }
+
+    return retval;
+}
+
+
+// C = A - B,       A.size == B.size
+struct Matrix_t *n_Sub_Matrix(struct Matrix_t *A, struct Matrix_t *B){
+    struct Matrix_t *C = NULL;
+    
+    if(__same_dimension_mtx(A,B)){
+        C = Create_Matrix(A->size_x,A->size_y);
+        if(C){
+            for(unsigned int y = 0; y < C->size_y; ++y){
+                for(unsigned int x = 0; x < C->size_x; ++x){
+                    C->data[y][x] = A->data[y][x] - B->data[y][x];
+                }
+            }
+        }
+    }
+
+    return C;
+}
+
+
+// C = A ^ T,       ( cat :p ), does not delete A
+struct Matrix_t *n_Transpose_Matrix(struct Matrix_t *cool_matrix){
+// Remember: (N x M) ^ T = (M x N)
+    struct Matrix_t *C = NULL;
+    if(cool_matrix){
+        C = Create_Matrix(cool_matrix->size_y,cool_matrix->size_x);
+        for(unsigned int y = 0; y < cool_matrix->size_y; ++y){
+            for(unsigned int x = 0; x < cool_matrix->size_x; ++x){
+                C->data[x][y] = cool_matrix->data[y][x];
+            }
+        }
+    }
+    return C;
+}
+
+
+// A = A ^ T, 
+int Transpose_Matrix(struct Matrix_t *cool_matrix){
+    struct Matrix_t *tee = n_Transpose_Matrix(cool_matrix);
+    
+    Destroy_Matrix(cool_matrix);
+
+    cool_matrix = tee;
+
+    return TRUE;
+}
+
+// SUM(V0[n] * V1[n])
+LONG_MATRIX_D_TYPE  _Vector_Dot_Product(MATRIX_D_TYPE *v0, MATRIX_D_TYPE *v1, unsigned int len){
+    LONG_MATRIX_D_TYPE sum_ = 0;
+    for(unsigned int e = 0; e < len; e++){
+        sum_ += v0[e] * v1[e];
+    }
+    return sum_;
+}
+
+// C = A * B,       A.x == B.y, A.y == B.x
+struct Matrix_t *Mul_Matrix(struct Matrix_t *A, struct Matrix_t *B){
+    struct Matrix_t *C = NULL;
+    if(__can_be_multiplied_mtx(A,B)){
+        C = Create_Matrix(A->size_y, B->size_x);
+        
+        // This is speed method... because it's easier
+        struct Matrix_t *D = n_Transpose_Matrix(B);
+
+        for(unsigned int y = 0; y < A->size_y; ++y){
+            for(unsigned int x = 0; x < D->size_y; ++x){
+                C->data[y][x] = _Vector_Dot_Product(A->data[y],D->data[x], A->size_x);
+            }
+        }
+
+        Destroy_Matrix(D);
+    }
+    return C;
+}
+
+
+// A = A .* B,      A.size == B.size
+int Hadamard_Product(struct Matrix_t *A, struct Matrix_t *B){
+    int retval = MTX_FUNC_FAIL;
+    if(__same_dimension_mtx(A,B)){
+        for(unsigned int y = 0; y < A->size_y; ++y){
+            for(unsigned int x = 0; x < A->size_x; ++x){
+                A->data[y][x] *= B->data[y][x];
+            }
+        }
+        retval = MTX_FUNC_OK;
+    }
+    return retval;
+}
+
+
+// M2 = A .* B^T,   Ensures more cache hits accelerating large array multiplies
+struct Matrix_t *Mul_Large_Matrix(struct Matrix_t *A, struct Matrix_t *B){
+    struct Matrix_t *C = NULL;
+    if(__can_be_multiplied_mtx(A,B)){
+        C = Create_Matrix(A->size_y, B->size_x);
+        
+        // This is speed method... because it's easier
+        struct Matrix_t *D = n_Transpose_Matrix(B);
+
+        for(unsigned int y = 0; y < A->size_y; ++y){
+            for(unsigned int x = 0; x < D->size_y; ++x){
+                C->data[y][x] = _Vector_Dot_Product(A->data[y],D->data[x], A->size_x);
+            }
+        }
+
+        Destroy_Matrix(D);
+    }
+    return C;
+}
+
+
+// RET = SUM(A)
+LONG_MATRIX_D_TYPE  Sum_of_Matrix_Elements(struct Matrix_t *A){
+    LONG_MATRIX_D_TYPE sum_ = 0;
+    if(A){
+        for(unsigned int y = 0; y < A->size_y; ++y){
+            for(unsigned int x = 0; x < A->size_x; ++x){
+                sum_ += A->data[y][x];
+            }
+        }
+    }
+
+    return sum_;
+}
