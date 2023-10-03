@@ -1,0 +1,97 @@
+#!/bin/bash
+
+snake_to_uppercase() 
+{
+    local snake_case="$1"
+    uppercase_string="${snake_case^^}"
+    echo "$uppercase_string"
+}
+
+
+snake_to_camel() 
+{
+    local snake_case="$1"
+    local parts=()
+    IFS="_" read -ra parts <<< "$snake_case"
+    local camel_case=""
+    for part in "${parts[@]}"; do
+      camel_case+="$(tr '[:lower:]' '[:upper:]' <<< ${part:0:1})${part:1}"
+    done
+    echo "$camel_case"
+}
+
+mkdir $1
+cd $1
+mkdir include
+touch include/$1.h
+mkdir src
+touch src/$1.c
+touch src/main.c
+touch CMakeLists.txt
+
+snake_case_name=$1
+upper_case_name=$(snake_to_uppercase "$snake_case_name")
+camel_case_name=$(snake_to_camel "$snake_case_name")
+
+HEADER_CONTENT=$(cat << EOL
+#ifndef ${upper_case_name}_H
+#define ${upper_case_name}_H
+
+#define NUMERIC_ZERO 0
+
+int function(int arg);
+
+#endif
+
+EOL
+)
+
+SOURCE_CONTENT=$(cat << EOL
+#include "$snake_case_name.h"
+
+int function(int arg)
+{
+    return arg + NUMERIC_ZERO;
+}
+
+EOL
+)
+
+MAIN_CONTENT=$(cat << EOL
+#include "$snake_case_name.h"
+#include <Matrix_Utilities/Matrix_Accel.h>
+
+int main(int argc, char * argv[])
+{
+    struct Matrix_t* matrix = Create_Matrix(4, 4);
+    Print_Matrix(matrix);
+    return function(NUMERIC_ZERO);
+}
+EOL
+)
+
+CMAKE_CONTENT=$(cat << EOL
+cmake_minimum_required(VERSION 3.5)
+project($snake_case_name)
+
+get_filename_component(SRC_DIR "\${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
+
+find_library(MATRICES Matrix_Utilities)
+
+file(GLOB SOURCES src/*.c)
+
+include_directories(include)
+
+add_executable(\${PROJECT_NAME} \${SOURCES})
+
+install(TARGETS \${PROJECT_NAME} DESTINATION lib/\${PROJECT_NAME})
+
+target_link_libraries($snake_case_name PRIVATE \${MATRICES})
+
+EOL
+)
+
+echo "$SOURCE_CONTENT" >  "src/$snake_case_name.c"
+echo "$HEADER_CONTENT" >  "include/$snake_case_name.h"
+echo "$MAIN_CONTENT" >    "src/main.c"
+echo "$CMAKE_CONTENT" >   "CMakeLists.txt"
