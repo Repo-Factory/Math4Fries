@@ -77,3 +77,5 @@ echo "$SOURCE_CONTENT" >  "src/$snake_case_name.c"
 echo "$HEADER_CONTENT" >  "include/$snake_case_name.h"
 echo "$MAIN_CONTENT" >    "src/main.c"
 echo "$CMAKE_CONTENT" >   "CMakeLists.txt"
+
+mkdir build && cd build && cmake .. && make
