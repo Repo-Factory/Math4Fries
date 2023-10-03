@@ -1,24 +1,10 @@
 #!/bin/bash
 
-snake_to_uppercase() 
-{
-    local snake_case="$1"
-    uppercase_string="${snake_case^^}"
-    echo "$uppercase_string"
-}
-
-
-snake_to_camel() 
-{
-    local snake_case="$1"
-    local parts=()
-    IFS="_" read -ra parts <<< "$snake_case"
-    local camel_case=""
-    for part in "${parts[@]}"; do
-      camel_case+="$(tr '[:lower:]' '[:upper:]' <<< ${part:0:1})${part:1}"
-    done
-    echo "$camel_case"
-}
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SCRIPT_DIR/string_manipulations"
+snake_case_name=$1
+upper_case_name=$(snake_to_uppercase "$snake_case_name")
+camel_case_name=$(snake_to_camel "$snake_case_name")
 
 mkdir $1
 cd $1
@@ -28,10 +14,6 @@ mkdir src
 touch src/$1.c
 touch src/main.c
 touch CMakeLists.txt
-
-snake_case_name=$1
-upper_case_name=$(snake_to_uppercase "$snake_case_name")
-camel_case_name=$(snake_to_camel "$snake_case_name")
 
 HEADER_CONTENT=$(cat << EOL
 #ifndef ${upper_case_name}_H

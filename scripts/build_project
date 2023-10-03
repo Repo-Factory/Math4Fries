@@ -1,0 +1,13 @@
+mkdir build && cd build && cmake ..
+
+# If -i flag present, we will install shared library to machine for use later
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -i|--install)
+            sudo make install
+            ;;
+    esac
+    shift
+done
+
+make
